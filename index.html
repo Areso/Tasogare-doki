@@ -13,12 +13,138 @@ Scale With A Song - the game as long as single song
 In a webpage
 Language-Independence
 Use the Source, Luke
-
+2009-2019 Jayvee Enaguas (HarvettFox96). Released under libre/free licence(s) as Creative Commons Attribution (CC BY) 3.0, 4.0 and/or later, or OpenGameArt Attribution (OGA BY) 3.0. Applies worldwide countries including the Philippines, Spain, etc.
+https://onlinepngtools.com/create-transparent-png
 https://www.youtube.com/watch?v=Bv_J0j9hr0E tic-tac
+https://opengameart.org/content/school-girl
 -->
-
+<canvas width="800" height="480" id="canvasMap" class="canvas" style="z-index:-1"></canvas>
+<p style="position:absolute; top:60px; left: 20px">
+    GLOBALMAP
+</p>
 </body>
 <script>
+    //GLOBALMAP
+    //var globalMap = [[],[]];
+    var globalMap = [
+        [0,0,0,0,0,0,1,1,1,1],
+        [0,0,0,0,0,0,1,2,2,1],
+        [0,0,0,0,0,0,1,2,2,1],
+        [0,0,0,0,0,0,1,1,1,1],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0]
+    ]
+    var globalObjects = [
+        [0,0,2,0,0,2,0,0,0,1],
+        [0,0,0,2,0,3,0,5,5,0],
+        [2,0,0,0,0,2,0,5,5,0],
+        [0,2,0,0,2,0,0,0,0,0],
+        [0,0,0,0,0,0,2,0,2,2],
+        [2,2,2,0,0,2,0,3,0,0],
+        [0,3,0,0,0,0,0,0,2,2],
+        [2,0,2,2,0,0,2,0,0,0],
+        [2,0,0,0,0,0,3,0,3,0],
+        [2,4,2,2,2,2,2,2,2,2]
+    ]
+    var canvas_map      = document.getElementById("canvasMap");
+    var ctx_map         = canvas_map.getContext("2d");
+    var tile_grass      = loadImage('tiles/grass.png', composite_gm);//use forward slashes for Linux and Windows compatible. \ this slash works only in Windows.
+    var tile_sand       = loadImage('tiles/sand.png', composite_gm);
+    var tile_snow       = loadImage('tiles/snow.png', composite_gm);
+    var tile_water      = loadImage('tiles/water.png', composite_gm);
+    var tile_char       = loadImage('objects/character.png', composite_objects);
+    var tile_tree       = loadImage('objects/tree.png', composite_objects);
+    var tile_monster    =  loadImage('objects/monster.png', composite_objects);
+    var tile_house    =  loadImage('objects/house.png', composite_objects);
+    //console.log('we are here 1')
+    var imagesLoadedMap = 0;
 
+    function composite_gm() {
+        //console.log('we are here 2')
+        imagesLoadedMap = imagesLoadedMap*1 + 1;
+        if (imagesLoadedMap > 1) {
+            // composite now
+            //ctx.globalAlpha = 1.00;
+            //console.log('we are here 3')
+            for (i = 0; i < 10; i++) {
+                for (j = 0; j < 10; j++) {
+                    //console.log(globalMap[i][j])
+                    if (globalMap[i][j] === 0) {
+                        //console.log('draw grass')
+                        ctx_map.drawImage(tile_grass, i * 32, j * 32);   //draw background
+                    }
+                    if (globalMap[i][j] === 1) {
+                        //console.log('draw sand')
+                        ctx_map.drawImage(tile_sand, i * 32, j * 32);   //draw background
+                    }
+                    if (globalMap[i][j] === 2) {
+                        //console.log('draw water')
+                        ctx_map.drawImage(tile_water, i * 32, j * 32);   //draw background
+                    }
+                    if (globalMap[i][j] === 3) {
+                        //console.log('draw ice')
+                        ctx_map.drawImage(tile_ice, i * 32, j * 32);   //draw background
+                    }
+                }
+            }
+            //console.log(globalMap)
+        }
+    }
+    function composite_objects() {
+        //console.log('we are composing objects')
+        imagesLoadedMap = imagesLoadedMap*1 + 1;
+        if (imagesLoadedMap > 1) {
+            // composite now
+            //ctx.globalAlpha = 1.00;
+            //console.log('we are here 3')
+            for (i = 0; i < 10; i++) {
+                for (j = 0; j < 10; j++) {
+                    //console.log(globalObjects[i][j])
+                    if (globalObjects[i][j] === 0) {
+                        //console.log('draw grass')
+                        //nothing
+                    }
+                    if (globalObjects[i][j] === 1) {
+                        //console.log('draw character')
+                        ctx_map.drawImage(tile_char, i * 32, j * 32);   //draw background
+                    }
+
+                    if (globalObjects[i][j] === 2) {
+                        //console.log('draw obstruction')
+                        ctx_map.drawImage(tile_tree, i * 32, j * 32);   //draw background
+                    }
+                    if (globalObjects[i][j] === 3) {
+                        //console.log('draw monster')
+                        ctx_map.drawImage(tile_monster, i * 32, j * 32);   //draw background
+                    }
+                    if (globalObjects[i][j] === 4) {
+                        console.log('draw house')
+                        ctx_map.drawImage(tile_house, i * 32, j * 32);   //draw background
+                    }
+                }
+            }
+            //console.log(globalObjects[0][9])
+            //console.log(globalObjects[9][0])
+        }
+    }
+    function loadImage(src, onload) {
+        var img = new Image();
+        img.onload = onload;
+        img.src = src;
+        return img;
+    }
+    document.onkeyup = function(e) {
+        if(e.keyCode == 68) {
+            console.log("d")
+        }
+        //left arrow	37 / a 65
+        //up arrow	38 / w 87
+        //right arrow	39 /d 68
+        //down arrow	40 / s 83
+    }
 </script>
 </html>
