@@ -51,6 +51,7 @@ https://opengameart.org/content/school-girl
     var tile_sand       = loadImage('tiles/sand.png', composite_gm);
     var tile_snow       = loadImage('tiles/snow.png', composite_gm);
     var tile_water      = loadImage('tiles/water.png', composite_gm);
+    var tile_black      = loadImage('tiles/black.png', composite_gm);
     var tile_char       = loadImage('objects/character.png', composite_objects);
     var tile_tree       = loadImage('objects/tree.png', composite_objects);
     var tile_monster    = loadImage('objects/monster.png', composite_objects);
@@ -149,6 +150,34 @@ https://opengameart.org/content/school-girl
             ctx_map.drawImage(tile_char, game.charcoordx * 32, game.charcoordy * 32);
             //console.log(globalObjects[0][9])
             //console.log(globalObjects[9][0])
+            game.addFog();
+        }
+    }
+    function composite_blackfrog() {
+
+        imagesLoadedMap = imagesLoadedMap*1 + 1;
+        console.log(imagesLoadedMap > 0);
+        if (imagesLoadedMap > 0) {
+            console.log('we are composing blackfrog')
+            // composite now
+            //ctx.globalAlpha = 1.00;
+            //console.log('we are here 3')
+            for (i = 0; i < 10; i++) {
+                for (j = 0; j < 10; j++) {
+                    //console.log('we are inside nested loop')
+                    //console.log(globalObjects[i][j])
+
+                    if (game.blackfrog[j][i] === 0) {
+                        //console.log(game.blackfrog[i][j])
+                        //console.log('draw black tiles')
+                        console.log("i is "+i+"; j is "+j);
+                        ctx_map.drawImage(tile_black, i * 32, j * 32);
+                    }
+                    if (game.blackfrog[j][i] === 1) {
+
+                    }
+                }
+            }
         }
     }
     function loadImage(src, onload) {
@@ -282,9 +311,17 @@ https://opengameart.org/content/school-girl
         },
         addFog: function () {
             console.log("Adding black fog");
-
+            for (i = 0; i < 10; i++) {
+                for (j = 0; j < 10; j++) {
+                    if (Math.abs(game.charcoordx-j)<2 && Math.abs(game.charcoordy-i)<2) {
+                        game.blackfrog[i][j]=1;
+                        console.log("we are here")
+                    }
+                }
+            }
+            composite_blackfrog();
         }
     };
-    game.addFog();
+
 </script>
 </html>
