@@ -4,7 +4,6 @@
 </head>
 <body>
 <!--
-
 Celestial (speed adjusting)
 Ephemeral
 Under the Hood - sharing some code
@@ -39,7 +38,7 @@ https://opengameart.org/content/school-girl
         [0,0,0,0,0,0,0,0,0,0]
     ]
     var globalObjects = [
-        [0,0,2,0,0,2,0,0,0,1],
+        [0,0,2,0,0,2,0,0,0,0],
         [0,0,0,2,0,3,0,5,5,0],
         [2,0,0,0,0,2,0,5,5,0],
         [0,2,0,0,2,0,0,0,0,0],
@@ -48,7 +47,7 @@ https://opengameart.org/content/school-girl
         [0,3,0,0,0,0,0,0,2,2],
         [2,0,2,2,0,0,2,0,0,0],
         [2,0,0,0,0,0,3,0,3,0],
-        [2,4,2,2,2,2,2,2,2,2]
+        [2,4,2,2,0,2,2,2,2,2]
     ]
     var canvas_map      = document.getElementById("canvasMap");
     var ctx_map         = canvas_map.getContext("2d");
@@ -58,8 +57,8 @@ https://opengameart.org/content/school-girl
     var tile_water      = loadImage('tiles/water.png', composite_gm);
     var tile_char       = loadImage('objects/character.png', composite_objects);
     var tile_tree       = loadImage('objects/tree.png', composite_objects);
-    var tile_monster    =  loadImage('objects/monster.png', composite_objects);
-    var tile_house    =  loadImage('objects/house.png', composite_objects);
+    var tile_monster    = loadImage('objects/monster.png', composite_objects);
+    var tile_house      = loadImage('objects/house.png', composite_objects);
     //console.log('we are here 1')
     var imagesLoadedMap = 0;
 
@@ -73,19 +72,19 @@ https://opengameart.org/content/school-girl
             for (i = 0; i < 10; i++) {
                 for (j = 0; j < 10; j++) {
                     //console.log(globalMap[i][j])
-                    if (globalMap[i][j] === 0) {
+                    if (globalMap[j][i] === 0) {
                         //console.log('draw grass')
                         ctx_map.drawImage(tile_grass, i * 32, j * 32);   //draw background
                     }
-                    if (globalMap[i][j] === 1) {
+                    if (globalMap[j][i] === 1) {
                         //console.log('draw sand')
                         ctx_map.drawImage(tile_sand, i * 32, j * 32);   //draw background
                     }
-                    if (globalMap[i][j] === 2) {
+                    if (globalMap[j][i] === 2) {
                         //console.log('draw water')
                         ctx_map.drawImage(tile_water, i * 32, j * 32);   //draw background
                     }
-                    if (globalMap[i][j] === 3) {
+                    if (globalMap[j][i] === 3) {
                         //console.log('draw ice')
                         ctx_map.drawImage(tile_ice, i * 32, j * 32);   //draw background
                     }
@@ -104,29 +103,31 @@ https://opengameart.org/content/school-girl
             for (i = 0; i < 10; i++) {
                 for (j = 0; j < 10; j++) {
                     //console.log(globalObjects[i][j])
-                    if (globalObjects[i][j] === 0) {
+                    if (globalObjects[j][i] === 0) {
                         //console.log('draw grass')
                         //nothing
                     }
+                    /*
                     if (globalObjects[i][j] === 1) {
                         //console.log('draw character')
-                        ctx_map.drawImage(tile_char, i * 32, j * 32);   //draw background
+                        ctx_map.drawImage(tile_char, i * 32, j * 32);
                     }
-
-                    if (globalObjects[i][j] === 2) {
+                    */
+                    if (globalObjects[j][i] === 2) {
                         //console.log('draw obstruction')
-                        ctx_map.drawImage(tile_tree, i * 32, j * 32);   //draw background
+                        ctx_map.drawImage(tile_tree, i * 32, j * 32);
                     }
-                    if (globalObjects[i][j] === 3) {
+                    if (globalObjects[j][i] === 3) {
                         //console.log('draw monster')
-                        ctx_map.drawImage(tile_monster, i * 32, j * 32);   //draw background
+                        ctx_map.drawImage(tile_monster, i * 32, j * 32);
                     }
-                    if (globalObjects[i][j] === 4) {
+                    if (globalObjects[j][i] === 4) {
                         console.log('draw house')
-                        ctx_map.drawImage(tile_house, i * 32, j * 32);   //draw background
+                        ctx_map.drawImage(tile_house, i * 32, j * 32);
                     }
                 }
             }
+            ctx_map.drawImage(tile_char, game.charcoordx * 32, game.charcoordy * 32);
             //console.log(globalObjects[0][9])
             //console.log(globalObjects[9][0])
         }
@@ -138,13 +139,74 @@ https://opengameart.org/content/school-girl
         return img;
     }
     document.onkeyup = function(e) {
-        if(e.keyCode == 68) {
-            console.log("d")
+        if(e.keyCode == 38 || e.keyCode == 87) {
+            game.tryup()
         }
-        //left arrow	37 / a 65
-        //up arrow	38 / w 87
-        //right arrow	39 /d 68
-        //down arrow	40 / s 83
+        if(e.keyCode == 37 || e.keyCode == 65) {
+            game.tryleft()
+        }
+        if(e.keyCode == 40 || e.keyCode == 83) {
+            game.trydown()
+        }
+        if(e.keyCode == 68 || e.keyCode == 39) {
+            game.tryright()
+        }
     }
+    var game = {
+        charcoordx: 4,
+        charcoordy: 6,
+        tryup: function() {
+            console.log("up") //up arrow 39, w 87
+            if (game.charcoordy > 0) { //otherwise we are already in the lower part of field
+                console.log('current char coord is '+game.charcoordx+' '+game.charcoordy)
+                if (globalObjects[game.charcoordy-1][game.charcoordx]===0) {
+                    //then move!
+                    console.log('move up!');
+                    game.charcoordy = game.charcoordy-1;
+                    composite_gm();
+                    composite_objects();
+                }
+            }
+        },
+        tryleft: function() {
+            console.log("left") //right arrow 39, d 68
+            if (game.charcoordx > 0) { //otherwise we are already in the left part of field
+                console.log('current char coord is '+game.charcoordx+' '+game.charcoordy)
+                if (globalObjects[game.charcoordy][game.charcoordx-1]===0) {
+                    //then move!
+                    console.log('move left!');
+                    game.charcoordx = game.charcoordx-1;
+                    composite_gm();
+                    composite_objects();
+                }
+            }
+        },
+        trydown: function() {
+            console.log("down") //down arrow 39, s 83
+            if (game.charcoordy < 9) { //otherwise we are already in the upper part of field
+                console.log('current char coord is '+game.charcoordx+' '+game.charcoordy)
+                if (globalObjects[game.charcoordy+1][game.charcoordx]===0) {
+                    //then move!
+                    console.log('move down!');
+                    game.charcoordy = game.charcoordy+1;
+                    composite_gm();
+                    composite_objects();
+                }
+            }
+        },
+        tryright: function() {
+            console.log("right") //right arrow 39, d 68
+            if (game.charcoordx < 9) { //otherwise we are already in the right part of field
+                console.log('current char coord is '+game.charcoordx+' '+game.charcoordy)
+                if (globalObjects[game.charcoordy][game.charcoordx+1]===0) {
+                    //then move!
+                    console.log('move right!');
+                    game.charcoordx = game.charcoordx+1;
+                    composite_gm();
+                    composite_objects();
+                }
+            }
+        }
+    };
 </script>
 </html>
