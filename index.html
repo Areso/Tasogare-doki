@@ -17,14 +17,10 @@ https://onlinepngtools.com/create-transparent-png
 https://www.youtube.com/watch?v=Bv_J0j9hr0E tic-tac
 https://opengameart.org/content/school-girl
 -->
-<canvas width="800" height="480" id="canvasMap" class="canvas" style="z-index:-1"></canvas>
-<p style="position:absolute; top:60px; left: 20px">
-    GLOBALMAP
-</p>
+<canvas width="800" height="480" id="canvasMap" class="canvas" style="z-index:-1">Your browser doesn't support Canvas. Please use more modern browser!</canvas>
 </body>
 <script>
     //GLOBALMAP
-    //var globalMap = [[],[]];
     var globalMap = [
         [0,0,0,0,0,0,1,1,1,1],
         [0,0,0,0,0,0,1,2,2,1],
@@ -61,7 +57,30 @@ https://opengameart.org/content/school-girl
     var tile_house      = loadImage('objects/house.png', composite_objects);
     //console.log('we are here 1')
     var imagesLoadedMap = 0;
+    var monsterArray = [];
+    function populate_monster_list () {
 
+        for (i = 0; i < 10; i++) {
+            for (j = 0; j < 10; j++) {
+                if (globalObjects[i][j]===3) {
+                    mymonster = new Monster("monster", j, i);
+                    //console.log(myperson)
+                    monsterArray.push(mymonster);
+                }
+            }
+        }
+        function Monster(monster, coordx, coordy) {
+            this.monster = monster;
+            this.coordx = coordx;
+            this.coordy = coordy;
+        }
+
+
+
+
+
+    }
+    populate_monster_list();
     function composite_gm() {
         //console.log('we are here 2')
         imagesLoadedMap = imagesLoadedMap*1 + 1;
@@ -122,7 +141,7 @@ https://opengameart.org/content/school-girl
                         ctx_map.drawImage(tile_monster, i * 32, j * 32);
                     }
                     if (globalObjects[j][i] === 4) {
-                        console.log('draw house')
+                        //console.log('draw house')
                         ctx_map.drawImage(tile_house, i * 32, j * 32);
                     }
                 }
@@ -156,56 +175,98 @@ https://opengameart.org/content/school-girl
         charcoordx: 4,
         charcoordy: 6,
         tryup: function() {
-            console.log("up") //up arrow 39, w 87
+            //console.log("up") //up arrow 39, w 87
             if (game.charcoordy > 0) { //otherwise we are already in the lower part of field
-                console.log('current char coord is '+game.charcoordx+' '+game.charcoordy)
-                if (globalObjects[game.charcoordy-1][game.charcoordx]===0) {
+                //console.log('current char coord is '+game.charcoordx+' '+game.charcoordy)
+                isItHouse = false;
+                isItHouse = globalObjects[game.charcoordy-1][game.charcoordx]===4 ? true : false;
+                if (globalObjects[game.charcoordy-1][game.charcoordx]===0 || isItHouse) {
                     //then move!
-                    console.log('move up!');
+                    //console.log('move up!');
                     game.charcoordy = game.charcoordy-1;
                     composite_gm();
                     composite_objects();
+                    game.monster_check();
+                    if (isItHouse) {
+                        game.win();
+                    }
                 }
             }
         },
         tryleft: function() {
-            console.log("left") //right arrow 39, d 68
+            //console.log("left") //right arrow 39, d 68
             if (game.charcoordx > 0) { //otherwise we are already in the left part of field
-                console.log('current char coord is '+game.charcoordx+' '+game.charcoordy)
-                if (globalObjects[game.charcoordy][game.charcoordx-1]===0) {
+                //console.log('current char coord is '+game.charcoordx+' '+game.charcoordy)
+                isItHouse = false;
+                isItHouse = globalObjects[game.charcoordy][game.charcoordx-1]===4 ? true : false;
+                if (globalObjects[game.charcoordy][game.charcoordx-1]===0 || isItHouse) {
                     //then move!
-                    console.log('move left!');
+                    //console.log('move left!');
                     game.charcoordx = game.charcoordx-1;
                     composite_gm();
                     composite_objects();
+                    game.monster_check();
+                    if (isItHouse) {
+                        game.win();
+                    }
                 }
             }
         },
         trydown: function() {
-            console.log("down") //down arrow 39, s 83
+            //console.log("down") //down arrow 39, s 83
             if (game.charcoordy < 9) { //otherwise we are already in the upper part of field
-                console.log('current char coord is '+game.charcoordx+' '+game.charcoordy)
-                if (globalObjects[game.charcoordy+1][game.charcoordx]===0) {
+                //console.log('current char coord is '+game.charcoordx+' '+game.charcoordy)
+                isItHouse = false;
+                isItHouse = globalObjects[game.charcoordy+1][game.charcoordx]===4 ? true : false;
+                console.log(isItHouse)
+                if (globalObjects[game.charcoordy+1][game.charcoordx]===0 || isItHouse) {
                     //then move!
-                    console.log('move down!');
+                    //console.log('move down!');
                     game.charcoordy = game.charcoordy+1;
                     composite_gm();
                     composite_objects();
+                    game.monster_check();
+                    if (isItHouse) {
+                        game.win();
+                    }
                 }
             }
         },
         tryright: function() {
-            console.log("right") //right arrow 39, d 68
+            //console.log("right") //right arrow 39, d 68
+            isItHouse = false;
+            isItHouse = globalObjects[game.charcoordy][game.charcoordx+1]===4 ? true : false;
             if (game.charcoordx < 9) { //otherwise we are already in the right part of field
-                console.log('current char coord is '+game.charcoordx+' '+game.charcoordy)
-                if (globalObjects[game.charcoordy][game.charcoordx+1]===0) {
+                //console.log('current char coord is '+game.charcoordx+' '+game.charcoordy)
+                if (globalObjects[game.charcoordy][game.charcoordx+1]===0 || isItHouse) {
                     //then move!
-                    console.log('move right!');
+                    //console.log('move right!');
                     game.charcoordx = game.charcoordx+1;
                     composite_gm();
                     composite_objects();
+                    game.monster_check();
+                    if (isItHouse) {
+                        game.win();
+                    }
                 }
             }
+        },
+        monster_check: function () {
+            for (index = 0; index < monsterArray.length; ++index) {
+                //console.log(monsterArray[index]);
+                //console.log('charx is '+game.charcoordx+' charxy is '+game.charcoordy)
+                if (Math.abs(game.charcoordy-monsterArray[index].coordy)<=1) {
+                    if (Math.abs(game.charcoordx-monsterArray[index].coordx)<=1) {
+                        game.wasted();
+                    }
+                }
+            }
+        },
+        wasted: function() {
+            console.log("om-nom");
+        },
+        win: function() {
+            console.log("you are winner!");
         }
     };
 </script>
