@@ -1,6 +1,11 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <style>
+        body {
+            background-color:  #efe4b0;
+        }
+    </style>
 </head>
 <body>
 <!--
@@ -18,9 +23,16 @@ https://www.youtube.com/watch?v=Bv_J0j9hr0E tic-tac
 https://opengameart.org/content/school-girl
 -->
 <canvas width="800" height="480" id="canvasMap" class="canvas" style="z-index:-1">Your browser doesn't support Canvas. Please use more modern browser!</canvas>
+<canvas width="240" height="240" id="canvasControls" class="canvas" style="z-index:-1;position: absolute; left:800;top:0">Your browser doesn't support Canvas. Please use more modern browser!</canvas>
+<img src="objects/pointer-b.png" style="z-index:0;position: absolute; left:900;top:0">
+<img src="objects/pointer-l.png" onclick="game.tryleft()" style="z-index:1;position: absolute; left:800;top:160">
+<img src="objects/pointer-r.png" onclick="game.tryright()" style="z-index:1;position: absolute; left:1040;top:160">
+<img src="objects/pointer-u.png" onclick="game.tryup()" style="z-index:1;position: absolute; left:920;top:40">
+<img src="objects/pointer-d.png" onclick="game.trydown()" style="z-index:1;position: absolute; left:920;top:280">
 </body>
 <script>
     //GLOBALMAP
+    /*
     var globalMap = [
         [0,0,0,0,0,0,1,1,1,1],
         [0,0,0,0,0,0,1,2,2,1],
@@ -44,6 +56,36 @@ https://opengameart.org/content/school-girl
         [2,0,2,2,0,0,2,0,0,0],
         [2,0,0,0,0,0,3,0,3,0],
         [2,4,2,2,0,2,2,2,2,2]
+    ]*/
+    var globalMap = [
+        [0,0,0,0,0,0,1,1,1,1,0,0],
+        [0,0,0,0,0,0,1,2,2,1,0,0],
+        [0,0,0,0,0,0,1,2,2,1,0,0],
+        [0,0,0,0,0,0,1,1,1,1,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0]
+
+    ]
+
+    var globalObjects = [
+        [0,0,2,0,0,2,0,0,0,0,2,2],
+        [0,0,0,2,0,3,0,5,5,0,2,2],
+        [2,0,0,0,0,2,0,5,5,0,2,2],
+        [0,2,0,0,2,0,0,0,0,0,2,2],
+        [0,0,0,0,0,0,2,0,2,2,2,2],
+        [2,2,2,0,0,2,0,3,0,0,2,4],
+        [0,3,0,0,0,0,0,0,2,2,0,0],
+        [2,0,2,2,0,0,0,0,0,0,0,0],
+        [2,0,0,0,0,0,2,0,0,0,2,0],
+        [2,0,2,0,2,0,2,2,3,2,0,2],
+        [0,0,3,0,0,0,0,0,0,0,0,0],
+        [0,2,0,2,2,0,2,0,2,0,2,0]
     ]
     var canvas_map      = document.getElementById("canvasMap");
     var ctx_map         = canvas_map.getContext("2d");
@@ -56,11 +98,12 @@ https://opengameart.org/content/school-girl
     var tile_tree       = loadImage('objects/tree.png', composite_objects);
     var tile_monster    = loadImage('objects/monster.png', composite_objects);
     var tile_house      = loadImage('objects/house.png', composite_objects);
-    var sizeOfMap       = 10;
+    var sizeOfMap       = 12;
     //console.log('we are here 1')
     var imagesLoadedMap = 0;
     var monsterArray = [];
     var arry = [];
+
     function populate() {
         for (i=0; i < sizeOfMap; i++) {
             nestedArry = [];
@@ -73,8 +116,8 @@ https://opengameart.org/content/school-girl
     }
     var initted = false;
     function populate_monster_list () {
-        for (i = 0; i < 10; i++) {
-            for (j = 0; j < 10; j++) {
+        for (i = 0; i < sizeOfMap; i++) {
+            for (j = 0; j < sizeOfMap; j++) {
                 if (globalObjects[i][j]===3) {
                     mymonster = new Monster("monster", j, i);
                     //console.log(myperson)
@@ -119,6 +162,8 @@ https://opengameart.org/content/school-girl
             }
             //console.log(globalMap)
         }
+        composite_objects();
+        composite_blackfrog();
     }
     function composite_objects() {
         //console.log('we are composing objects')
@@ -210,8 +255,8 @@ https://opengameart.org/content/school-girl
         }
     }
     var game = {
-        charcoordx: 4,
-        charcoordy: 6,
+        charcoordx: 8,
+        charcoordy: 0,
         blackfrog: [],
         tryup: function() {
             //console.log("up") //up arrow 39, w 87
@@ -224,7 +269,7 @@ https://opengameart.org/content/school-girl
                     //console.log('move up!');
                     game.charcoordy = game.charcoordy-1;
                     composite_gm();
-                    composite_objects();
+                    //composite_objects();
                     game.monster_check();
                     if (isItHouse) {
                         game.win();
@@ -243,7 +288,7 @@ https://opengameart.org/content/school-girl
                     //console.log('move left!');
                     game.charcoordx = game.charcoordx-1;
                     composite_gm();
-                    composite_objects();
+                    //composite_objects();
                     game.monster_check();
                     if (isItHouse) {
                         game.win();
@@ -263,7 +308,7 @@ https://opengameart.org/content/school-girl
                     //console.log('move down!');
                     game.charcoordy = game.charcoordy+1;
                     composite_gm();
-                    composite_objects();
+                    //composite_objects();
                     game.monster_check();
                     if (isItHouse) {
                         game.win();
@@ -282,7 +327,7 @@ https://opengameart.org/content/school-girl
                     //console.log('move right!');
                     game.charcoordx = game.charcoordx+1;
                     composite_gm();
-                    composite_objects();
+                    //composite_objects();
                     game.monster_check();
                     if (isItHouse) {
                         game.win();
@@ -334,6 +379,7 @@ https://opengameart.org/content/school-girl
     };
 
 </script>
+<!-- Yandex.Metrika counter -->
 <script type="text/javascript" >
     (function (d, w, c) {
         (w[c] = w[c] || []).push(function() {
@@ -361,4 +407,4 @@ https://opengameart.org/content/school-girl
     })(document, window, "yandex_metrika_callbacks");
 </script>
 <noscript><div><img src="https://mc.yandex.ru/watch/52087242" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
-</html>
+<!-- /Yandex.Metrika counter --></html>
