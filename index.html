@@ -60,8 +60,19 @@ https://opengameart.org/content/school-girl
     //console.log('we are here 1')
     var imagesLoadedMap = 0;
     var monsterArray = [];
+    var arry = [];
+    function populate() {
+        for (i=0; i < sizeOfMap; i++) {
+            nestedArry = [];
+            for (j=0; j < sizeOfMap; j++) {
+                nestedArry.push(0);
+            }
+            arry.push(nestedArry);
+        }
+        game.initFog();
+    }
+    var initted = false;
     function populate_monster_list () {
-
         for (i = 0; i < 10; i++) {
             for (j = 0; j < 10; j++) {
                 if (globalObjects[i][j]===3) {
@@ -76,11 +87,6 @@ https://opengameart.org/content/school-girl
             this.coordx = coordx;
             this.coordy = coordy;
         }
-
-
-
-
-
     }
     populate_monster_list();
     function composite_gm() {
@@ -149,8 +155,10 @@ https://opengameart.org/content/school-girl
                 }
             }
             ctx_map.drawImage(tile_char, game.charcoordx * 32, game.charcoordy * 32);
-            //console.log(globalObjects[0][9])
-            //console.log(globalObjects[9][0])
+            if (initted === false) {
+                populate();
+                initted = true;
+            }
             game.addFog();
         }
     }
@@ -204,18 +212,7 @@ https://opengameart.org/content/school-girl
     var game = {
         charcoordx: 4,
         charcoordy: 6,
-        blackfrog: [
-            [0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0],
-        ],
+        blackfrog: [],
         tryup: function() {
             //console.log("up") //up arrow 39, w 87
             if (game.charcoordy > 0) { //otherwise we are already in the lower part of field
@@ -330,8 +327,38 @@ https://opengameart.org/content/school-girl
                 }
             }
             composite_blackfrog();
+        },
+        initFog: function () {
+            game.blackfrog = arry;
         }
     };
 
 </script>
+<script type="text/javascript" >
+    (function (d, w, c) {
+        (w[c] = w[c] || []).push(function() {
+            try {
+                w.yaCounter52087242 = new Ya.Metrika({
+                    id:52087242,
+                    clickmap:true,
+                    trackLinks:true,
+                    accurateTrackBounce:true,
+                    webvisor:true
+                });
+            } catch(e) { }
+        });
+
+        var n = d.getElementsByTagName("script")[0],
+            s = d.createElement("script"),
+            f = function () { n.parentNode.insertBefore(s, n); };
+        s.type = "text/javascript";
+        s.async = true;
+        s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+        if (w.opera == "[object Opera]") {
+            d.addEventListener("DOMContentLoaded", f, false);
+        } else { f(); }
+    })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/52087242" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 </html>
