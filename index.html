@@ -9,26 +9,43 @@
 </head>
 <body>
 <!--
-Celestial (speed adjusting)
+https://github.com/Areso/Tasogare-doki
+
 Ephemeral
-Under the Hood - sharing some code
 Super Secret Stash
 Scale With A Song - the game as long as single song
 In a webpage
-Language-Independence
-Use the Source, Luke
+
+
 2009-2019 Jayvee Enaguas (HarvettFox96). Released under libre/free licence(s) as Creative Commons Attribution (CC BY) 3.0, 4.0 and/or later, or OpenGameArt Attribution (OGA BY) 3.0. Applies worldwide countries including the Philippines, Spain, etc.
 https://onlinepngtools.com/create-transparent-png
 https://www.youtube.com/watch?v=Bv_J0j9hr0E tic-tac
 https://opengameart.org/content/school-girl
+
+You play as a little girl who had last. You should find path to home, where mother and father are awaiting you. Avoid monsters or they will eat you. They see one 1 square straight and diagonally both. Find home before music ends, or monsters will find you!
+Actual version of the game could be found here: Mirror1: cosmodream.ga/Tasogare-doki Mirror2: areso.github.io/Tasogare-doki
+Technology Notes: special thanks to Notepad Plus Plus ( https://github.com/notepad-plus-plus/notepad-plus-plus )
+Вы играете за маленькую девочку, которая потерялась. Вы должны найти путь домой, где мама и папа ждут вас. Избегайте монстров или они вас съедят. Они видят 1 квадрат и по диагонали и по прямым. Найдите дом, прежде чем музыка закончится, или монстры съедят вас!
+Актуальная версия игры здесь: Зеркало1: cosmodream.ga/Tasogare-doki Зеркало2: areso.github.io/Tasogare-doki
+Технозаметка: специальное спасибо Notepad++ ( https://github.com/notepad-plus-plus/notepad-plus-plus )
+
 -->
 <canvas width="800" height="480" id="canvasMap" class="canvas" style="z-index:-1">Your browser doesn't support Canvas. Please use more modern browser!</canvas>
 <canvas width="240" height="240" id="canvasControls" class="canvas" style="z-index:-1;position: absolute; left:800;top:0">Your browser doesn't support Canvas. Please use more modern browser!</canvas>
 <img src="objects/pointer-b.png" style="z-index:0;position: absolute; left:900;top:0">
+<div id="divTimeLeft" style="z-index:2;position: absolute; left:800;top:0"></div>
+<!--<div id="divMuteMusic" onclick="mutemusic() "style="z-index:1;position: absolute; left:900;top:0"></div>-->
+<button id="buttonMuteMusic" type="button" style="z-index:2;position: absolute; left:980;top:0; display:none" >Mute music!</button>
 <img src="objects/pointer-l.png" onclick="game.tryleft()" style="z-index:1;position: absolute; left:800;top:160">
 <img src="objects/pointer-r.png" onclick="game.tryright()" style="z-index:1;position: absolute; left:1040;top:160">
 <img src="objects/pointer-u.png" onclick="game.tryup()" style="z-index:1;position: absolute; left:920;top:40">
 <img src="objects/pointer-d.png" onclick="game.trydown()" style="z-index:1;position: absolute; left:920;top:280">
+<a href="https://github.com/Areso/Tasogare-doki"><img src="objects/forkme.png" onclick="game.trydown()" style="z-index:2;position: absolute; left:520;top:280"></a>
+<audio id="myAudio">
+
+    <source src="music/Musopen_-_In_the_Hall_Of_The_Mountain_King.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
 </body>
 <script>
     //GLOBALMAP
@@ -72,9 +89,8 @@ https://opengameart.org/content/school-girl
         [0,0,0,0,0,0,0,0,0,0,0,0]
 
     ]
-
     var globalObjects = [
-        [0,0,2,0,0,2,0,0,0,0,2,2],
+        [6,0,2,0,0,2,0,0,0,0,2,2],
         [0,0,0,2,0,3,0,5,5,0,2,2],
         [2,0,0,0,0,2,0,5,5,0,2,2],
         [0,2,0,0,2,0,0,0,0,0,2,2],
@@ -98,12 +114,37 @@ https://opengameart.org/content/school-girl
     var tile_tree       = loadImage('objects/tree.png', composite_objects);
     var tile_monster    = loadImage('objects/monster.png', composite_objects);
     var tile_house      = loadImage('objects/house.png', composite_objects);
+    var tile_cabin      = loadImage('objects/cabin.png', composite_objects);
     var sizeOfMap       = 12;
-    //console.log('we are here 1')
+    mytext = "Вы потерялись на берегу озера. Найдите дом прежде, чем закончится музыка \n";
+    mytext = mytext+"Не приближайтесь к монстрам или они вас съедят. Они видят на 1 клетку по диагонали и по прямым \n";
+    mytext = mytext+"You are lost on the lake shore. Find your home before music ends \n";
+    mytext = mytext+"Dont come close to monsters or they would eat you. They see one 1 square straight and diagonally both"
+    mydiedText = "К сожалению, вы уже умерли. Второго шанса нет! \n";
+    mydiedText = mydiedText + "Sadly, but you are already died. There are no second chance!";
+    myhomeText = "Вы уже дома! Нет необходимости снова искать путь домой \n";
+    myhomeText = myhomeText+ "You are safe in your home. There is no need to find path to home again";
+    mycabinText = "Вы нашли лесную заимку с секретной комнатой! Тут есть немного еды и воды! \n";
+    mycabinText = mycabinText+ "You are found cabin in the forest! There is secret room with food and water";
     var imagesLoadedMap = 0;
     var monsterArray = [];
     var arry = [];
+    var musicPlay = false;
+    var playedTime = 0;
+    var mytimer = 0;
+    function mutemusic() {
+        console.log("try mute music");
+        document.getElementById('myAudio').volume=0;
+    }
 
+    function timeleft () {
+        playedTime = playedTime + 1;
+        if (playedTime < 153) {
+            document.getElementById("divTimeLeft").innerText = 153 - playedTime;
+        } else {
+            game.wasted();
+        }
+    }
     function populate() {
         for (i=0; i < sizeOfMap; i++) {
             nestedArry = [];
@@ -197,12 +238,17 @@ https://opengameart.org/content/school-girl
                         //console.log('draw house')
                         ctx_map.drawImage(tile_house, i * 32, j * 32);
                     }
+                    if (globalObjects[j][i] === 6) {
+                        //console.log('draw secret cabin')
+                        ctx_map.drawImage(tile_cabin, i * 32, j * 32);
+                    }
                 }
             }
             ctx_map.drawImage(tile_char, game.charcoordx * 32, game.charcoordy * 32);
             if (initted === false) {
                 populate();
                 initted = true;
+
             }
             game.addFog();
         }
@@ -259,78 +305,206 @@ https://opengameart.org/content/school-girl
         charcoordy: 0,
         blackfrog: [],
         tryup: function() {
-            //console.log("up") //up arrow 39, w 87
-            if (game.charcoordy > 0) { //otherwise we are already in the lower part of field
-                //console.log('current char coord is '+game.charcoordx+' '+game.charcoordy)
-                isItHouse = false;
-                isItHouse = globalObjects[game.charcoordy-1][game.charcoordx]===4 ? true : false;
-                if (globalObjects[game.charcoordy-1][game.charcoordx]===0 || isItHouse) {
-                    //then move!
-                    //console.log('move up!');
-                    game.charcoordy = game.charcoordy-1;
-                    composite_gm();
-                    //composite_objects();
-                    game.monster_check();
-                    if (isItHouse) {
-                        game.win();
+            if (musicPlay===false) {
+                isPlayed = localStorage.getItem('played');
+                if( isPlayed  ) {
+                    if (isPlayed === "10") {
+                        alert(mydiedText);
+                    }
+                    if (isPlayed === "11") {
+                        alert(myhomeText);
+                    }
+                } else {
+                    mytimer = setInterval(timeleft, 1000);
+                    musicPlay = true;
+                    document.getElementById('myAudio').play();
+                    document.getElementById('buttonMuteMusic').style="z-index:1;position: absolute; left:980;top:0;";
+                    alert(mytext);
+                }
+            }
+            isPlayed = localStorage.getItem('played');
+            if (isPlayed) {
+                if (isPlayed === "10") {
+                    alert(mydiedText);
+                }
+                if (isPlayed === "11") {
+                    alert(myhomeText);
+                }
+            } else {
+                //console.log("up") //up arrow 39, w 87
+                if (game.charcoordy > 0) { //otherwise we are already in the lower part of field
+                    //console.log('current char coord is '+game.charcoordx+' '+game.charcoordy)
+                    isItHouse = false;
+                    isItHouse = globalObjects[game.charcoordy - 1][game.charcoordx] === 4 ? true : false;
+                    isItCabin = false;
+                    isItCabin = globalObjects[game.charcoordy - 1][game.charcoordx] === 6 ? true : false;
+                    if (globalObjects[game.charcoordy - 1][game.charcoordx] === 0 || isItHouse || isItCabin) {
+                        //then move!
+                        //console.log('move up!');
+                        game.charcoordy = game.charcoordy - 1;
+                        composite_gm();
+                        //composite_objects();
+                        game.monster_check();
+                        if (isItHouse) {
+                            game.win();
+                        }
+                        if (isItCabin) {
+                            alert(mycabinText);
+                        }
                     }
                 }
             }
         },
         tryleft: function() {
             //console.log("left") //right arrow 39, d 68
-            if (game.charcoordx > 0) { //otherwise we are already in the left part of field
-                //console.log('current char coord is '+game.charcoordx+' '+game.charcoordy)
-                isItHouse = false;
-                isItHouse = globalObjects[game.charcoordy][game.charcoordx-1]===4 ? true : false;
-                if (globalObjects[game.charcoordy][game.charcoordx-1]===0 || isItHouse) {
-                    //then move!!!
-                    //console.log('move left!');
-                    game.charcoordx = game.charcoordx-1;
-                    composite_gm();
-                    //composite_objects();
-                    game.monster_check();
-                    if (isItHouse) {
-                        game.win();
+            if (musicPlay===false) {
+                isPlayed = localStorage.getItem('played');
+                if( isPlayed  ) {
+                    if (isPlayed === "10") {
+                        alert(mydiedText);
+                    }
+                    if (isPlayed === "11") {
+                        alert(myhomeText);
+                    }
+                } else {
+                    mytimer = setInterval(timeleft, 1000);
+                    musicPlay = true;
+                    document.getElementById('myAudio').play();
+                    document.getElementById('buttonMuteMusic').style="z-index:1;position: absolute; left:980;top:0;";
+                    alert(mytext);
+                }
+            }
+            isPlayed = localStorage.getItem('played');
+            if (isPlayed) {
+                if (isPlayed === "10") {
+                    alert(mydiedText);
+                }
+                if (isPlayed === "11") {
+                    alert(myhomeText);
+                }
+            } else {
+                if (game.charcoordx > 0) { //otherwise we are already in the left part of field
+                    //console.log('current char coord is '+game.charcoordx+' '+game.charcoordy)
+                    isItHouse = false;
+                    isItHouse = globalObjects[game.charcoordy][game.charcoordx - 1] === 4 ? true : false;
+                    isItCabin = false;
+                    isItCabin = globalObjects[game.charcoordy][game.charcoordx - 1] === 6 ? true : false;
+                    if (globalObjects[game.charcoordy][game.charcoordx - 1] === 0 || isItHouse || isItCabin) {
+                        //then move!!!
+                        //console.log('move left!');
+                        game.charcoordx = game.charcoordx - 1;
+                        composite_gm();
+                        //composite_objects();
+                        game.monster_check();
+                        if (isItHouse) {
+                            game.win();
+                        }
+                        if (isItCabin) {
+                            alert(mycabinText);
+                        }
                     }
                 }
             }
         },
         trydown: function() {
-            //console.log("down") //down arrow 39, s 83
-            if (game.charcoordy < sizeOfMap-1) { //otherwise we are already in the upper part of field
-                //console.log('current char coord is '+game.charcoordx+' '+game.charcoordy)
-                isItHouse = false;
-                isItHouse = globalObjects[game.charcoordy+1][game.charcoordx]===4 ? true : false;
-                //console.log(isItHouse)
-                if (globalObjects[game.charcoordy+1][game.charcoordx]===0 || isItHouse) {
-                    //then move!
-                    //console.log('move down!');
-                    game.charcoordy = game.charcoordy+1;
-                    composite_gm();
-                    //composite_objects();
-                    game.monster_check();
-                    if (isItHouse) {
-                        game.win();
+            if (musicPlay===false) {
+                isPlayed = localStorage.getItem('played');
+                if( isPlayed  ) {
+                    if (isPlayed === "10") {
+                        alert(mydiedText);
+                    }
+                    if (isPlayed === "11") {
+                        alert(myhomeText);
+                    }
+                } else {
+                    mytimer = setInterval(timeleft, 1000);
+                    musicPlay = true;
+                    document.getElementById('myAudio').play();
+                    document.getElementById('buttonMuteMusic').style="z-index:1;position: absolute; left:980;top:0;";
+                    alert(mytext);
+                }
+            }
+            isPlayed = localStorage.getItem('played');
+            if (isPlayed) {
+                if (isPlayed === "10") {
+                    alert(mydiedText);
+                }
+                if (isPlayed === "11") {
+                    alert(myhomeText);
+                }
+            } else {
+                if (game.charcoordy < sizeOfMap - 1) { //otherwise we are already in the upper part of field
+                    //console.log('current char coord is '+game.charcoordx+' '+game.charcoordy)
+                    isItHouse = false;
+                    isItHouse = globalObjects[game.charcoordy + 1][game.charcoordx] === 4 ? true : false;
+                    isItCabin = false;
+                    isItCabin = globalObjects[game.charcoordy + 1][game.charcoordx] === 6 ? true : false;
+                    //console.log(isItHouse)
+                    if (globalObjects[game.charcoordy + 1][game.charcoordx] === 0 || isItHouse || isItCabin) {
+                        //then move!
+                        //console.log('move down!');
+                        game.charcoordy = game.charcoordy + 1;
+                        composite_gm();
+                        //composite_objects();
+                        game.monster_check();
+                        if (isItHouse) {
+                            game.win();
+                        }
+                        if (isItCabon) {
+                            alert(mycabinText);
+                        }
                     }
                 }
             }
         },
         tryright: function() {
-            //console.log("right") //right arrow 39, d 68
-            isItHouse = false;
-            isItHouse = globalObjects[game.charcoordy][game.charcoordx+1]===4 ? true : false;
-            if (game.charcoordx < sizeOfMap-1) { //otherwise we are already in the right part of field
-                //console.log('current char coord is '+game.charcoordx+' '+game.charcoordy)
-                if (globalObjects[game.charcoordy][game.charcoordx+1]===0 || isItHouse) {
-                    //then move!
-                    //console.log('move right!');
-                    game.charcoordx = game.charcoordx+1;
-                    composite_gm();
-                    //composite_objects();
-                    game.monster_check();
-                    if (isItHouse) {
-                        game.win();
+            if (musicPlay===false) {
+                isPlayed = localStorage.getItem('played');
+                if( isPlayed  ) {
+                    if (isPlayed === "10") {
+                        alert(mydiedText);
+                    }
+                    if (isPlayed === "11") {
+                        alert(myhomeText);
+                    }
+                } else {
+                    mytimer = setInterval(timeleft, 1000);
+                    musicPlay = true;
+                    document.getElementById('myAudio').play();
+                    document.getElementById('buttonMuteMusic').style="z-index:1;position: absolute; left:980;top:0;";
+                    alert(mytext);
+                }
+            }
+            isPlayed = localStorage.getItem('played');
+            if (isPlayed) {
+                if (isPlayed === "10") {
+                    alert(mydiedText);
+                }
+                if (isPlayed === "11") {
+                    alert(myhomeText);
+                }
+            } else {
+                //console.log("right") //right arrow 39, d 68
+                isItHouse = false;
+                isItHouse = globalObjects[game.charcoordy][game.charcoordx + 1] === 4 ? true : false;
+                isItCabin = false;
+                isItCabin = globalObjects[game.charcoordy][game.charcoordx + 1] === 6 ? true : false;
+                if (game.charcoordx < sizeOfMap - 1) { //otherwise we are already in the right part of field
+
+                    //console.log('current char coord is '+game.charcoordx+' '+game.charcoordy)
+                    if (globalObjects[game.charcoordy][game.charcoordx + 1] === 0 || isItHouse || isItCabin) {
+                        //then move!
+                        //console.log('move right!');
+                        game.charcoordx = game.charcoordx + 1;
+                        composite_gm();
+                        //composite_objects();
+                        game.monster_check();
+                        if (isItHouse) {
+                            game.win();
+                        }
+                        if (isItCabin) {
+                            alert(mycabinText);
+                        }
                     }
                 }
             }
@@ -348,9 +522,17 @@ https://opengameart.org/content/school-girl
         },
         wasted: function() {
             console.log("om-nom");
+            clearTimeout(mytimer);
+            localStorage.setItem('played', 10);
+            document.getElementById('myAudio').volume=0;
+            alert('Вас съели! You were eaten!');
         },
         win: function() {
             console.log("you are winner!");
+            clearTimeout(mytimer);
+            localStorage.setItem('played', 11);
+            document.getElementById('myAudio').volume=0;
+            alert('Вы нашли дом! You found the home!');
         },
         addFog: function () {
             //console.log("Adding black fog");
@@ -380,6 +562,7 @@ https://opengameart.org/content/school-girl
 
 </script>
 <!-- Yandex.Metrika counter -->
+
 <script type="text/javascript" >
     (function (d, w, c) {
         (w[c] = w[c] || []).push(function() {
@@ -407,4 +590,5 @@ https://opengameart.org/content/school-girl
     })(document, window, "yandex_metrika_callbacks");
 </script>
 <noscript><div><img src="https://mc.yandex.ru/watch/52087242" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
 <!-- /Yandex.Metrika counter --></html>
