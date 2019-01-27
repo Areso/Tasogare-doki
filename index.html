@@ -117,9 +117,13 @@ Technology Notes: special thanks to Notepad Plus Plus ( https://github.com/notep
     var tile_cabin      = loadImage('objects/cabin.png', composite_objects);
     var sizeOfMap       = 12;
     mytext = "Вы потерялись на берегу озера. Найдите дом прежде, чем закончится музыка \n";
+    mytext = mytext+"Монстры неподвижны, пока слушают музыку. Как только музыка закончится, они найдус вас и съедят \n";
     mytext = mytext+"Не приближайтесь к монстрам или они вас съедят. Они видят на 1 клетку по диагонали и по прямым \n";
+    mytext = mytext+"У вас всего одна попытка, чтобы пройти игру. Играйте аккуратно! \n";
     mytext = mytext+"You are lost on the lake shore. Find your home before music ends \n";
-    mytext = mytext+"Dont come close to monsters or they would eat you. They see one 1 square straight and diagonally both"
+    mytext = mytext+"Monsters are still, while they are listening the music. As soon as music ends, they will find and eat you \n";
+    mytext = mytext+"Dont come close to monsters or they would eat you. They see one 1 square straight and diagonally both \n";
+    mytext = mytext+"You have only chance to find path to your home. Be careful!";
     mydiedText = "К сожалению, вы уже умерли. Второго шанса нет! \n";
     mydiedText = mydiedText + "Sadly, but you are already died. There are no second chance!";
     myhomeText = "Вы уже дома! Нет необходимости снова искать путь домой \n";
