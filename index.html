@@ -40,6 +40,7 @@ Technology Notes: special thanks to Notepad Plus Plus ( https://github.com/notep
 <img src="objects/pointer-r.png" onclick="game.tryright()" style="z-index:1;position: absolute; left:1040;top:160">
 <img src="objects/pointer-u.png" onclick="game.tryup()" style="z-index:1;position: absolute; left:920;top:40">
 <img src="objects/pointer-d.png" onclick="game.trydown()" style="z-index:1;position: absolute; left:920;top:280">
+<a href="https://github.com/Areso/Tasogare-doki"><img src="objects/forkme.png" onclick="game.trydown()" style="z-index:2;position: absolute; left:520;top:280"></a>
 <audio id="myAudio">
 
     <source src="music/Musopen_-_In_the_Hall_Of_The_Mountain_King.mp3" type="audio/mpeg">
@@ -89,7 +90,7 @@ Technology Notes: special thanks to Notepad Plus Plus ( https://github.com/notep
 
     ]
     var globalObjects = [
-        [0,0,2,0,0,2,0,0,0,0,2,2],
+        [6,0,2,0,0,2,0,0,0,0,2,2],
         [0,0,0,2,0,3,0,5,5,0,2,2],
         [2,0,0,0,0,2,0,5,5,0,2,2],
         [0,2,0,0,2,0,0,0,0,0,2,2],
@@ -113,12 +114,18 @@ Technology Notes: special thanks to Notepad Plus Plus ( https://github.com/notep
     var tile_tree       = loadImage('objects/tree.png', composite_objects);
     var tile_monster    = loadImage('objects/monster.png', composite_objects);
     var tile_house      = loadImage('objects/house.png', composite_objects);
+    var tile_cabin      = loadImage('objects/cabin.png', composite_objects);
     var sizeOfMap       = 12;
     mytext = "Вы потерялись на берегу озера. Найдите дом прежде, чем закончится музыка \n";
     mytext = mytext+"Не приближайтесь к монстрам или они вас съедят. Они видят на 1 клетку по диагонали и по прямым \n";
     mytext = mytext+"You are lost on the lake shore. Find your home before music ends \n";
     mytext = mytext+"Dont come close to monsters or they would eat you. They see one 1 square straight and diagonally both"
-    //console.log('we are here 1')
+    mydiedText = "К сожалению, вы уже умерли. Второго шанса нет! \n";
+    mydiedText = mydiedText + "Sadly, but you are already died. There are no second chance!";
+    myhomeText = "Вы уже дома! Нет необходимости снова искать путь домой \n";
+    myhomeText = myhomeText+ "You are safe in your home. There is no need to find path to home again";
+    mycabinText = "Вы нашли лесную заимку с секретной комнатой! Тут есть немного еды и воды! \n";
+    mycabinText = mycabinText+ "You are found cabin in the forest! There is secret room with food and water";
     var imagesLoadedMap = 0;
     var monsterArray = [];
     var arry = [];
@@ -169,19 +176,6 @@ Technology Notes: special thanks to Notepad Plus Plus ( https://github.com/notep
     function composite_gm() {
         //console.log('we are here 2')
         imagesLoadedMap = imagesLoadedMap*1 + 1;
-        isPlayed = localStorage.getItem('played');
-        console.log(isPlayed);
-        if( isPlayed  ) {
-            if (isPlayed === 10) {
-                alert('You are already died');
-                game.wasted();
-            }
-            if (isPlayed === 11) {
-                alert('You are already won');
-                game.win();
-            }
-
-        }
         if (imagesLoadedMap > 1) {
             // composite now
             //ctx.globalAlpha = 1.00;
@@ -243,6 +237,10 @@ Technology Notes: special thanks to Notepad Plus Plus ( https://github.com/notep
                     if (globalObjects[j][i] === 4) {
                         //console.log('draw house')
                         ctx_map.drawImage(tile_house, i * 32, j * 32);
+                    }
+                    if (globalObjects[j][i] === 6) {
+                        //console.log('draw secret cabin')
+                        ctx_map.drawImage(tile_cabin, i * 32, j * 32);
                     }
                 }
             }
@@ -308,28 +306,39 @@ Technology Notes: special thanks to Notepad Plus Plus ( https://github.com/notep
         blackfrog: [],
         tryup: function() {
             if (musicPlay===false) {
-                mytimer = setInterval(timeleft, 1000);
-                musicPlay = true;
-                document.getElementById('myAudio').play();
-                document.getElementById('buttonMuteMusic').style="z-index:1;position: absolute; left:980;top:0;";
-
-                alert(mytext);
+                isPlayed = localStorage.getItem('played');
                 if( isPlayed  ) {
-                    if (isPlayed === 10) {
-                        game.wasted();
+                    if (isPlayed === "10") {
+                        alert(mydiedText);
                     }
-                    if (isPlayed === 10) {
-                        game.wasted();
+                    if (isPlayed === "11") {
+                        alert(myhomeText);
                     }
+                } else {
+                    mytimer = setInterval(timeleft, 1000);
+                    musicPlay = true;
+                    document.getElementById('myAudio').play();
+                    document.getElementById('buttonMuteMusic').style="z-index:1;position: absolute; left:980;top:0;";
+                    alert(mytext);
                 }
             }
-            if (isPlayed) {} else {
+            isPlayed = localStorage.getItem('played');
+            if (isPlayed) {
+                if (isPlayed === "10") {
+                    alert(mydiedText);
+                }
+                if (isPlayed === "11") {
+                    alert(myhomeText);
+                }
+            } else {
                 //console.log("up") //up arrow 39, w 87
                 if (game.charcoordy > 0) { //otherwise we are already in the lower part of field
                     //console.log('current char coord is '+game.charcoordx+' '+game.charcoordy)
                     isItHouse = false;
                     isItHouse = globalObjects[game.charcoordy - 1][game.charcoordx] === 4 ? true : false;
-                    if (globalObjects[game.charcoordy - 1][game.charcoordx] === 0 || isItHouse) {
+                    isItCabin = false;
+                    isItCabin = globalObjects[game.charcoordy - 1][game.charcoordx] === 6 ? true : false;
+                    if (globalObjects[game.charcoordy - 1][game.charcoordx] === 0 || isItHouse || isItCabin) {
                         //then move!
                         //console.log('move up!');
                         game.charcoordy = game.charcoordy - 1;
@@ -339,6 +348,9 @@ Technology Notes: special thanks to Notepad Plus Plus ( https://github.com/notep
                         if (isItHouse) {
                             game.win();
                         }
+                        if (isItCabin) {
+                            alert(mycabinText);
+                        }
                     }
                 }
             }
@@ -346,26 +358,38 @@ Technology Notes: special thanks to Notepad Plus Plus ( https://github.com/notep
         tryleft: function() {
             //console.log("left") //right arrow 39, d 68
             if (musicPlay===false) {
-                mytimer = setInterval(timeleft, 1000);
-                musicPlay = true;
-                document.getElementById('myAudio').play();
-                document.getElementById('buttonMuteMusic').style="z-index:1;position: absolute; left:980;top:0;";
-                alert(mytext);
+                isPlayed = localStorage.getItem('played');
                 if( isPlayed  ) {
-                    if (isPlayed === 10) {
-                        game.wasted();
+                    if (isPlayed === "10") {
+                        alert(mydiedText);
                     }
-                    if (isPlayed === 10) {
-                        game.wasted();
+                    if (isPlayed === "11") {
+                        alert(myhomeText);
                     }
+                } else {
+                    mytimer = setInterval(timeleft, 1000);
+                    musicPlay = true;
+                    document.getElementById('myAudio').play();
+                    document.getElementById('buttonMuteMusic').style="z-index:1;position: absolute; left:980;top:0;";
+                    alert(mytext);
                 }
             }
-            if (isPlayed) {} else {
+            isPlayed = localStorage.getItem('played');
+            if (isPlayed) {
+                if (isPlayed === "10") {
+                    alert(mydiedText);
+                }
+                if (isPlayed === "11") {
+                    alert(myhomeText);
+                }
+            } else {
                 if (game.charcoordx > 0) { //otherwise we are already in the left part of field
                     //console.log('current char coord is '+game.charcoordx+' '+game.charcoordy)
                     isItHouse = false;
                     isItHouse = globalObjects[game.charcoordy][game.charcoordx - 1] === 4 ? true : false;
-                    if (globalObjects[game.charcoordy][game.charcoordx - 1] === 0 || isItHouse) {
+                    isItCabin = false;
+                    isItCabin = globalObjects[game.charcoordy][game.charcoordx - 1] === 6 ? true : false;
+                    if (globalObjects[game.charcoordy][game.charcoordx - 1] === 0 || isItHouse || isItCabin) {
                         //then move!!!
                         //console.log('move left!');
                         game.charcoordx = game.charcoordx - 1;
@@ -375,34 +399,48 @@ Technology Notes: special thanks to Notepad Plus Plus ( https://github.com/notep
                         if (isItHouse) {
                             game.win();
                         }
+                        if (isItCabin) {
+                            alert(mycabinText);
+                        }
                     }
                 }
             }
         },
         trydown: function() {
             if (musicPlay===false) {
-                mytimer = setInterval(timeleft, 1000);
-                musicPlay = true;
-                document.getElementById('myAudio').play();
-                document.getElementById('buttonMuteMusic').style="z-index:1;position: absolute; left:980;top:0;";
-                alert(mytext);
+                isPlayed = localStorage.getItem('played');
                 if( isPlayed  ) {
-                    if (isPlayed === 10) {
-                        game.wasted();
+                    if (isPlayed === "10") {
+                        alert(mydiedText);
                     }
-                    if (isPlayed === 10) {
-                        game.wasted();
+                    if (isPlayed === "11") {
+                        alert(myhomeText);
                     }
+                } else {
+                    mytimer = setInterval(timeleft, 1000);
+                    musicPlay = true;
+                    document.getElementById('myAudio').play();
+                    document.getElementById('buttonMuteMusic').style="z-index:1;position: absolute; left:980;top:0;";
+                    alert(mytext);
                 }
             }
-            //console.log("down") //down arrow 39, s 83
-            if (isPlayed) {} else {
+            isPlayed = localStorage.getItem('played');
+            if (isPlayed) {
+                if (isPlayed === "10") {
+                    alert(mydiedText);
+                }
+                if (isPlayed === "11") {
+                    alert(myhomeText);
+                }
+            } else {
                 if (game.charcoordy < sizeOfMap - 1) { //otherwise we are already in the upper part of field
                     //console.log('current char coord is '+game.charcoordx+' '+game.charcoordy)
                     isItHouse = false;
                     isItHouse = globalObjects[game.charcoordy + 1][game.charcoordx] === 4 ? true : false;
+                    isItCabin = false;
+                    isItCabin = globalObjects[game.charcoordy + 1][game.charcoordx] === 6 ? true : false;
                     //console.log(isItHouse)
-                    if (globalObjects[game.charcoordy + 1][game.charcoordx] === 0 || isItHouse) {
+                    if (globalObjects[game.charcoordy + 1][game.charcoordx] === 0 || isItHouse || isItCabin) {
                         //then move!
                         //console.log('move down!');
                         game.charcoordy = game.charcoordy + 1;
@@ -412,33 +450,49 @@ Technology Notes: special thanks to Notepad Plus Plus ( https://github.com/notep
                         if (isItHouse) {
                             game.win();
                         }
+                        if (isItCabon) {
+                            alert(mycabinText);
+                        }
                     }
                 }
             }
         },
         tryright: function() {
             if (musicPlay===false) {
-                mytimer = setInterval(timeleft, 1000);
-                musicPlay = true;
-                document.getElementById('myAudio').play();
-                document.getElementById('buttonMuteMusic').style="z-index:1;position: absolute; left:980;top:0;";
-                alert(mytext);
+                isPlayed = localStorage.getItem('played');
                 if( isPlayed  ) {
-                    if (isPlayed === 10) {
-                        game.wasted();
+                    if (isPlayed === "10") {
+                        alert(mydiedText);
                     }
-                    if (isPlayed === 10) {
-                        game.wasted();
+                    if (isPlayed === "11") {
+                        alert(myhomeText);
                     }
+                } else {
+                    mytimer = setInterval(timeleft, 1000);
+                    musicPlay = true;
+                    document.getElementById('myAudio').play();
+                    document.getElementById('buttonMuteMusic').style="z-index:1;position: absolute; left:980;top:0;";
+                    alert(mytext);
                 }
             }
-            if (isPlayed) {} else {
+            isPlayed = localStorage.getItem('played');
+            if (isPlayed) {
+                if (isPlayed === "10") {
+                    alert(mydiedText);
+                }
+                if (isPlayed === "11") {
+                    alert(myhomeText);
+                }
+            } else {
                 //console.log("right") //right arrow 39, d 68
                 isItHouse = false;
                 isItHouse = globalObjects[game.charcoordy][game.charcoordx + 1] === 4 ? true : false;
+                isItCabin = false;
+                isItCabin = globalObjects[game.charcoordy][game.charcoordx + 1] === 6 ? true : false;
                 if (game.charcoordx < sizeOfMap - 1) { //otherwise we are already in the right part of field
+
                     //console.log('current char coord is '+game.charcoordx+' '+game.charcoordy)
-                    if (globalObjects[game.charcoordy][game.charcoordx + 1] === 0 || isItHouse) {
+                    if (globalObjects[game.charcoordy][game.charcoordx + 1] === 0 || isItHouse || isItCabin) {
                         //then move!
                         //console.log('move right!');
                         game.charcoordx = game.charcoordx + 1;
@@ -447,6 +501,9 @@ Technology Notes: special thanks to Notepad Plus Plus ( https://github.com/notep
                         game.monster_check();
                         if (isItHouse) {
                             game.win();
+                        }
+                        if (isItCabin) {
+                            alert(mycabinText);
                         }
                     }
                 }
@@ -505,6 +562,7 @@ Technology Notes: special thanks to Notepad Plus Plus ( https://github.com/notep
 
 </script>
 <!-- Yandex.Metrika counter -->
+
 <script type="text/javascript" >
     (function (d, w, c) {
         (w[c] = w[c] || []).push(function() {
@@ -532,4 +590,5 @@ Technology Notes: special thanks to Notepad Plus Plus ( https://github.com/notep
     })(document, window, "yandex_metrika_callbacks");
 </script>
 <noscript><div><img src="https://mc.yandex.ru/watch/52087242" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
 <!-- /Yandex.Metrika counter --></html>
