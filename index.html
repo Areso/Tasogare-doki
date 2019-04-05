@@ -114,6 +114,7 @@ Technology Notes: special thanks to Notepad Plus Plus ( https://github.com/notep
     var tile_char       = loadImage('objects/character.png', composite_objects);
     var tile_tree       = loadImage('objects/tree.png', composite_objects);
     var tile_monster    = loadImage('objects/monster.png', composite_objects);
+    var tile_bloody_monster  = loadImage('objects/bloody_monster.png', composite_objects);
     var tile_house      = loadImage('objects/house.png', composite_objects);
     var tile_cabin      = loadImage('objects/cabin.png', composite_objects);
     var sizeOfMap       = 12;
@@ -218,6 +219,7 @@ Technology Notes: special thanks to Notepad Plus Plus ( https://github.com/notep
             // composite now
             //ctx.globalAlpha = 1.00;
             //console.log('we are here 3')
+            dead = 0
             for (i = 0; i < sizeOfMap; i++) {
                 for (j = 0; j < sizeOfMap; j++) {
                     //console.log(globalObjects[i][j])
@@ -239,6 +241,12 @@ Technology Notes: special thanks to Notepad Plus Plus ( https://github.com/notep
                         //console.log('draw monster')
                         ctx_map.drawImage(tile_monster, i * 32, j * 32);
                     }
+                    if (globalObjects[j][i] === 7) {
+                        //console.log('draw monster')
+                        //WHAT? TODO
+                        //ctx_map.drawImage(tile_bloody_monster, i * 32, j * 32);
+                        dead = 1;
+                    }
                     if (globalObjects[j][i] === 4) {
                         //console.log('draw house')
                         ctx_map.drawImage(tile_house, i * 32, j * 32);
@@ -249,7 +257,11 @@ Technology Notes: special thanks to Notepad Plus Plus ( https://github.com/notep
                     }
                 }
             }
-            ctx_map.drawImage(tile_char, game.charcoordx * 32, game.charcoordy * 32);
+            if (dead !== 1) {
+                ctx_map.drawImage(tile_char, game.charcoordx * 32, game.charcoordy * 32);
+            } else {
+                ctx_map.drawImage(tile_bloody_monster, game.charcoordx * 32, game.charcoordy * 32);
+            }
             if (initted === false) {
                 populate();
                 initted = true;
@@ -520,6 +532,12 @@ Technology Notes: special thanks to Notepad Plus Plus ( https://github.com/notep
                 //console.log('charx is '+game.charcoordx+' charxy is '+game.charcoordy)
                 if (Math.abs(game.charcoordy-monsterArray[index].coordy)<=1) {
                     if (Math.abs(game.charcoordx-monsterArray[index].coordx)<=1) {
+                        //TODO FIX THAT
+                        //monsterArray[index].coordx = game.charcoordx;
+                        //monsterArray[index].coordy = game.charcoordy;
+                        globalObjects[game.charcoordx][game.charcoordy] = 7;
+                        globalObjects[monsterArray[index].coordy][monsterArray[index].coordx] = 0;
+                        composite_gm();
                         game.wasted();
                     }
                 }
